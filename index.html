@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch the Ball</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      display: block;
+      background: #282c34;
+    }
+    #score {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Score: 0</div>
+  <canvas id="gameCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let paddleWidth = 150;
+    let paddleHeight = 20;
+    let paddleX = (canvas.width - paddleWidth) / 2;
+    const paddleY = canvas.height - paddleHeight - 10;
+    const ballRadius = 15;
+    let ballX = Math.random() * (canvas.width - ballRadius * 2) + ballRadius;
+    let ballY = 0;
+    let ballSpeed = 5;
+    let score = 0;
+
+    function drawPaddle() {
+      ctx.fillStyle = '#00ffcc';
+      ctx.fillRect(paddleX, paddleY, paddleWidth, paddleHeight);
+    }
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = '#ff5733';
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function updateScore() {
+      document.getElementById('score').textContent = `Score: ${score}`;
+    }
+
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawPaddle();
+      drawBall();
+
+      ballY += ballSpeed;
+
+      if (
+        ballY + ballRadius > paddleY &&
+        ballX > paddleX &&
+        ballX < paddleX + paddleWidth
+      ) {
+        ballY = 0;
+        ballX = Math.random() * (canvas.width - ballRadius * 2) + ballRadius;
+        score++;
+        updateScore();
+        ballSpeed += 0.5;
+      }
+
+      if (ballY > canvas.height) {
+        alert('Game Over! Your score: ' + score);
+        document.location.reload();
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      paddleX = e.clientX - paddleWidth / 2;
+      if (paddleX < 0) paddleX = 0;
+      if (paddleX + paddleWidth > canvas.width) paddleX = canvas.width - paddleWidth;
+    });
+
+    updateScore();
+    gameLoop();
+  </script>
+</body>
+</html>
